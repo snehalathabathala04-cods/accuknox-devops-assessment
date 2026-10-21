@@ -42,33 +42,26 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
 
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Configure SSH private key
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: us-east-1
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Deploy Wisecow using AWS SSM
+      - name: Verify EC2 SSH host key
         env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+
+          ssh-keygen -F "$EC2_HOST" > /dev/null
+
+      - name: Deploy Wisecow to Kubernetes
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          COMMAND_ID=$(aws ssm send-command \
-            --instance-ids "i-0bec03de36785280d" \
-            --document-name "AWS-RunShellScript" \
-            --parameters "commands=[\"sudo k3s kubectl set image deployment/wisecow wisecow=snehalatha04/wisecow:${IMAGE_TAG}\",\"sudo k3s kubectl rollout status deployment/wisecow --timeout=180s\"]" \
-            --query "Command.CommandId" \
-            --output text)
-
-          aws ssm wait command-executed \
-            --command-id "$COMMAND_ID" \
-            --instance-id "i-0bec03de36785280d"
-
-          aws ssm get-command-invocation \
-            --command-id "$COMMAND_ID" \
-            --instance-id "i-0bec03de36785280d" \
-            --query "{Status:Status,Output:StandardOutputContent,Error:StandardErrorContent}"
+          ssh -o BatchMode=yes "${EC2_USER}@${EC2_HOST}" \
+            "sudo k3s kubectl set image deployment/wisecow wisecow=snehalatha04/wisecow:${IMAGE_TAG} && sudo k3s kubectl rollout status deployment/wisecow --timeout=180s"
