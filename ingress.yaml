@@ -9,8 +9,7 @@ spec:
         - wisecow.local
       secretName: wisecow-tls
   rules:
-    - host: wisecow.local
-      http:
+    - http:
         paths:
           - path: /
             pathType: Prefix
