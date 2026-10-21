@@ -101,13 +101,19 @@ I configured TLS for the Wisecow application using Kubernetes Ingress and a self
 
 This enables HTTPS communication for testing. Since the certificate is self-signed, browsers may display a security warning.
 
+I tested the application through HTTPS and confirmed that the Wisecow page loads successfully.
+
 ## 5. Application Access
 
-The application is deployed on AWS EC2 and can be accessed using the following URL while the instance is running:
+The application is deployed on AWS EC2 and can be accessed using the following URLs while the instance is running:
 
-**Application URL:** http://52.71.87.27/
+**HTTP URL:** http://52.71.87.27/
+
+**HTTPS URL:** https://52.71.87.27/
 
 The application displays a cow illustration with a random quote.
+
+**Note:** The HTTPS URL uses a self-signed certificate, so the browser may show a certificate warning.
 
 ## 6. Testing and Verification
 
@@ -116,7 +122,8 @@ I verified the following:
 - Docker image build and push using GitHub Actions.
 - Successful execution of the CI/CD workflow.
 - Kubernetes deployment through the automated workflow.
-- Application accessibility through the browser.
+- Application accessibility through HTTP.
+- HTTPS access using a self-signed TLS certificate.
 
 ## Conclusion
 
