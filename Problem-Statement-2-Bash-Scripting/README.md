@@ -49,6 +49,9 @@ Enter the application URL when prompted.
 - Tested CPU usage, memory usage, disk usage, and running processes.
 - Verified alerts when a predefined threshold is exceeded.
 
+  <img width="600" height="300" alt="image" src="https://github.com/user-attachments/assets/8c073c75-828c-4a3e-ba37-68e8b5603359" />
+
+
 ### Application Health Checker
 
 - Tested with `https://www.google.com` – HTTP 200 – Application UP.
