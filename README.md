@@ -1,208 +1,113 @@
-# Wisecow Application – DevOps Assignment
+
+# AccuKnox DevOps Trainee Assignment
 
 ## Project Overview
 
-This project is part of the AccuKnox DevOps assignment. The goal is to containerize the Wisecow application using Docker, deploy it on Kubernetes, and automate the build and deployment process using GitHub Actions.
+This repository contains my solutions for the AccuKnox DevOps Trainee Assignment.
 
-The application runs on an AWS EC2 Ubuntu server using K3s Kubernetes.
+The assignment includes two problem statements focused on application containerization, Kubernetes deployment, CI/CD automation, and Bash scripting.
 
-**Original Project:** https://github.com/nyrahul/wisecow
+## Problem Statement 1: Wisecow Application Deployment
 
-**GitHub Repository:** https://github.com/snehalathabathala04-cods/wisecow
+Containerized the Wisecow application using Docker and deployed it on K3s Kubernetes running on AWS EC2.
 
-## Tools and Technologies
+### Tools and Technologies
 
-- **Git and GitHub:** To manage the source code and CI/CD workflow.
-- **Docker:** To build and containerize the Wisecow application.
-- **Docker Hub:** To store and manage Docker images.
-- **Kubernetes (K3s):** To deploy and manage the application.
-- **GitHub Actions:** To automate the build, push, and deployment process.
-- **AWS EC2 (Ubuntu):** To host the Kubernetes environment.
-- **SSH:** To connect GitHub Actions to the EC2 server for deployment.
-- **Kubernetes Ingress:** To expose the application through HTTP and HTTPS.
+- Linux (Ubuntu)
+- Git and GitHub
+- Docker and Docker Hub
+- Kubernetes (K3s)
+- GitHub Actions
+- AWS EC2
+- SSH
+- Kubernetes Ingress and TLS
 
-## Project Files
+### Implementation
 
-| File | Purpose |
-|---|---|
-| `wisecow.sh` | Original Wisecow application |
-| `Dockerfile` | Builds the Docker image |
-| `deployment.yaml` | Deploys the application on Kubernetes |
-| `service.yaml` | Exposes the application through a Kubernetes Service |
-| `ingress.yaml` | Configures application access and TLS |
-| `.github/workflows/ci-cd.yaml` | Automates Docker build, push, and Kubernetes deployment |
-| `README.md` | Contains project documentation and deployment steps |
+- Created a Dockerfile to containerize the Wisecow application.
+- Created Kubernetes Deployment, Service, and Ingress manifests.
+- Pushed Docker images to Docker Hub.
+- Configured GitHub Actions to automate Docker image builds and pushes.
+- Configured automated Kubernetes deployment through SSH.
+- Enabled HTTPS using a self-signed TLS certificate.
+- Tested application accessibility through HTTP and HTTPS.
 
-## 1. Docker Containerization
+### Application Access
 
-I created a Dockerfile to containerize the Wisecow application with its required dependencies.
+HTTP: http://52.71.87.27/
 
-The Docker image contains the application script and the packages required to run it.
+HTTPS: https://52.71.87.27/
 
-**To build the Docker image:**
+Note: The application URLs work only when the EC2 instance and required services are running. HTTPS uses a self-signed certificate.
 
-```bash
-docker build -t wisecow:latest .
-```
+### Project Files
 
-**To run the Docker container:**
+[View Problem Statement 1 - Wisecow](./Problem-Statement-1-Wisecow/)
 
-```bash
-docker run -d -p 4499:4499 --name wisecow wisecow:latest
-```
+Docker Hub: https://hub.docker.com/r/snehalatha04/wisecow
 
-**To check the running container:**
+Original Wisecow Project: https://github.com/nyrahul/wisecow
 
-```bash
-docker ps
-```
+## Problem Statement 2: Bash Scripting
 
-**Docker Hub Image:** `snehalatha04/wisecow:latest`
+Selected two objectives from the assignment to implement using Bash scripting.
 
-## 2. Docker Hub Image Registry
+### Task 1: System Health Monitoring Script
 
-I used Docker Hub to store the Wisecow Docker image.
+Developed a Bash script to monitor Linux system health.
 
-I configured GitHub Actions to automatically build and push the Docker image to Docker Hub whenever changes are pushed to the `main` branch.
+The script checks:
 
-The image is pushed with two tags:
+- CPU usage
+- Memory usage
+- Disk usage
+- Running processes
 
-- **`latest`:** Represents the latest version of the application.
-- **Commit SHA:** Identifies the image created from a specific GitHub commit.
+It compares system metrics with predefined thresholds and displays warnings when thresholds are exceeded.
 
-**Docker Hub Repository and Image Tags:**
+### Task 2: Application Health Checker
 
-https://hub.docker.com/r/snehalatha04/wisecow/tags
+A Bash script to check whether an application is accessible using HTTP response status codes.
 
-**Docker Image:** `snehalatha04/wisecow:latest`
+The script is intended to identify whether an application is UP or DOWN.
 
-**To pull the image from Docker Hub:**
+### Project Files
 
-```bash
-docker pull snehalatha04/wisecow:latest
-```
+[View Problem Statement 2 - Bash Scripting](./Problem-Statement-2-Bash-Scripting/)
 
-Kubernetes uses the Docker Hub image to run the Wisecow application.
+## CI/CD Automation
 
-## 3. Kubernetes Deployment
+The GitHub Actions workflow automates:
 
-I used K3s Kubernetes on an AWS EC2 Ubuntu instance to deploy the application.
+1. Source code checkout.
+2. Docker image build.
+3. Docker Hub image push.
+4. SSH connection to the deployment EC2 instance.
+5. Kubernetes deployment update and rollout verification.
 
-I created Kubernetes manifest files for the Deployment, Service, and Ingress.
+Workflow: `.github/workflows/ci-cd.yaml`
 
-- **Deployment:** Manages the Wisecow application containers.
-- **Service:** Exposes the application inside the Kubernetes environment.
-- **Ingress:** Provides HTTP and HTTPS access to the application.
+GitHub Actions: https://github.com/snehalathabathala04-cods/wisecow/actions
 
-**To deploy the application:**
+## Repository Structure
 
-```bash
-sudo k3s kubectl apply -f deployment.yaml
-sudo k3s kubectl apply -f service.yaml
-sudo k3s kubectl apply -f ingress.yaml
-```
-
-**To check the deployment status:**
-
-```bash
-sudo k3s kubectl get pods
-sudo k3s kubectl get deployments
-sudo k3s kubectl get services
-sudo k3s kubectl get ingress
-```
-
-The application is exposed through a Kubernetes Service and is accessible using Ingress.
-
-## 4. CI/CD Using GitHub Actions
-
-I configured a GitHub Actions workflow to automate the Docker image build and Kubernetes deployment.
-
-### Continuous Integration (CI)
-
-Whenever changes are pushed to the `main` branch, GitHub Actions:
-
-1. Checks out the source code from GitHub.
-2. Sets up Docker Buildx.
-3. Logs in to Docker Hub using GitHub Actions Secrets.
-4. Builds the Docker image.
-5. Pushes the image to Docker Hub with `latest` and commit SHA tags.
-
-### Continuous Deployment (CD)
-
-After a successful Docker image build:
-
-1. GitHub Actions connects to the AWS EC2 instance using SSH.
-2. Updates the Kubernetes Deployment with the newly built Docker image.
-3. Waits for the Kubernetes rollout to complete.
-
-This process helps automate application updates without manually deploying every new version.
-
-The workflow uses GitHub Actions Secrets to store credentials securely.
-
-**Workflow File:** `.github/workflows/ci-cd.yaml`
-
-**GitHub Actions Workflow:**
-
-https://github.com/snehalathabathala04-cods/wisecow/actions
-
-## 5. TLS Configuration
-
-I configured TLS for the Wisecow application using Kubernetes Ingress and a self-signed certificate.
-
-This enables HTTPS communication for testing.
-
-I tested the application through HTTPS and confirmed that the Wisecow page loads successfully.
-
-Since the certificate is self-signed, browsers may display a security warning because the certificate is not trusted by a public certificate authority.
-
-For a production environment, a trusted TLS certificate and domain name would be recommended.
-
-## 6. Application Access
-
-The application is deployed on AWS EC2 and can be accessed using the following URLs while the instance is running and the network configuration allows access.
-
-**HTTP URL:**
-
-http://52.71.87.27/
-
-**HTTPS URL:**
-
-https://52.71.87.27/
-
-The application displays a cow illustration with a random quote.
-
-Each time the page is refreshed, the application may display a different quote.
-
-**Note:** The HTTPS URL uses a self-signed certificate, so the browser may show a certificate warning.
-
-## 7. Testing and Verification
-
-I tested and verified the following:
-
-- Docker image build and push using GitHub Actions.
-- Docker image availability in Docker Hub.
-- Successful execution of the CI/CD workflow.
-- Kubernetes deployment through the automated workflow.
-- Application accessibility through HTTP.
-- HTTPS access using a self-signed TLS certificate.
-- Wisecow application output in the browser.
-
-## 8. Project Outcome
-
-Through this project, I implemented the following:
-
-- Containerized the Wisecow application using Docker.
-- Stored the Docker images in Docker Hub.
-- Deployed the application using K3s Kubernetes.
-- Exposed the application using Kubernetes Service and Ingress.
-- Automated Docker image builds and deployment using GitHub Actions.
-- Configured HTTPS communication using a self-signed TLS certificate.
-- Verified that the application is accessible through a web browser.
+    wisecow/
+    ├── .github/
+    │   └── workflows/
+    │       └── ci-cd.yaml
+    ├── Problem-Statement-1-Wisecow/
+    │   ├── Dockerfile
+    │   ├── wisecow.sh
+    │   ├── deployment.yaml
+    │   ├── service.yaml
+    │   ├── ingress.yaml
+    │   └── README.md
+    ├── Problem-Statement-2-Bash-Scripting/
+    │   ├── system_health.sh
+    │   └── README.md
+    └── README.md
 
 ## Conclusion
 
-I successfully containerized the Wisecow application using Docker and deployed it on Kubernetes.
+This assignment demonstrates practical experience with Docker containerization, Kubernetes deployment, GitHub Actions CI/CD automation, Linux system monitoring, and Bash scripting.
 
-I used Docker Hub to store the application images and implemented a GitHub Actions CI/CD pipeline to automate image builds, push images to Docker Hub, and deploy updates to Kubernetes.
-
-I also configured TLS using a self-signed certificate and verified that the application works through HTTP and HTTPS.
