@@ -53,6 +53,7 @@ Enter the application URL when prompted.
 
 - Tested with `https://www.google.com` – HTTP 200 – Application UP.
 - Tested with `http://127.0.0.1:9999` – HTTP 000 – Application DOWN.
+  
   <img width="600" height="300" alt="image" src="https://github.com/user-attachments/assets/f96b58af-a88d-4419-810d-5c71c7b9d7aa" />
 
 ## Result
